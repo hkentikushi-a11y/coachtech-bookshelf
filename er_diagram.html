@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookShelf ER図</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+body { font-family: sans-serif; background: #f8fafc; color: #1a1f36; margin: 0; padding: 24px; }
+h1 { color: #0d2466; font-size: 20px; margin: 0 0 8px; }
+.meta { font-size: 12px; color: #6b7280; margin: 0 0 16px; }
+.diagram-wrap { background: #fff; border: 1px solid #d8e0ed; border-radius: 8px; padding: 16px; overflow-x: auto; }
+.mermaid { min-width: 900px; }
+.legend { margin-top: 12px; font-size: 12px; color: #6b7280; background: #f0f4ff; border-radius: 6px; padding: 10px 14px; line-height: 1.9; }
+</style>
+</head>
+<body>
+<h1>BookShelf ER図</h1>
+<p class="meta">基本テーブル: users / books / genres / book_genre / reviews / favorites / review_likes &nbsp;|&nbsp; ★応用: reading_plans / notifications / personal_access_tokens</p>
+<div class="diagram-wrap">
+<div class="mermaid">
+erDiagram
+    users {
+        bigint id PK
+        varchar name
+        varchar email UK
+        timestamp email_verified_at
+        varchar password
+        varchar remember_token
+        timestamp created_at
+        timestamp updated_at
+    }
+    books {
+        bigint id PK
+        bigint user_id FK
+        varchar title
+        varchar author
+        varchar isbn UK
+        date published_date
+        text description
+        varchar image_url
+        timestamp created_at
+        timestamp updated_at
+    }
+    genres {
+        bigint id PK
+        varchar name UK
+        timestamp created_at
+        timestamp updated_at
+    }
+    book_genre {
+        bigint book_id PK
+        bigint genre_id PK
+    }
+    reviews {
+        bigint id PK
+        bigint user_id FK
+        bigint book_id FK
+        tinyint rating
+        text comment
+        timestamp created_at
+        timestamp updated_at
+    }
+    favorites {
+        bigint user_id PK
+        bigint book_id PK
+        timestamp created_at
+        timestamp updated_at
+    }
+    review_likes {
+        bigint user_id PK
+        bigint review_id PK
+        timestamp created_at
+        timestamp updated_at
+    }
+    reading_plans {
+        bigint id PK
+        bigint user_id FK
+        bigint book_id FK
+        enum status
+        date target_date
+        date started_at
+        date finished_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    notifications {
+        bigint id PK
+        bigint user_id FK
+        varchar type
+        json data
+        timestamp read_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    personal_access_tokens {
+        bigint id PK
+        varchar tokenable_type
+        bigint tokenable_id
+        varchar name
+        varchar token UK
+        text abilities
+        timestamp last_used_at
+        timestamp expires_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    users ||--o{ books : "登録する"
+    users ||--o{ reviews : "投稿する"
+    users ||--o{ favorites : "お気に入り"
+    users ||--o{ review_likes : "いいね"
+    users ||--o{ reading_plans : "計画する"
+    users ||--o{ notifications : "受け取る"
+    users ||--o{ personal_access_tokens : "APIトークン"
+    books ||--o{ book_genre : ""
+    genres ||--o{ book_genre : ""
+    books ||--o{ reviews : "レビューされる"
+    books ||--o{ favorites : ""
+    books ||--o{ reading_plans : ""
+    reviews ||--o{ review_likes : ""
+</div>
+</div>
+<div class="legend">PK=主キー / FK=外部キー(cascadeOnDelete) / UK=UNIQUE制約 / book_genre・favorites・review_likes は複合PK の中間テーブル</div>
+<script>mermaid.initialize({startOnLoad:true,theme:"default"});</script>
+</body>
+</html>
